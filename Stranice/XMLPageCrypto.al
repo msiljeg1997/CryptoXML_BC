@@ -1,9 +1,9 @@
-page 50102 "Crypto rates API"
+page 50143 "XMLPageCrypto"
 {
     PageType = List;
     ApplicationArea = All;
     UsageCategory = Administration;
-    SourceTable = CryptoRatesAPITable;
+    SourceTable = XMLCryptoDataTableFromCore;
 
     layout
     {
@@ -96,12 +96,28 @@ page 50102 "Crypto rates API"
                     Magija: Codeunit "JSONCodeUnit";
 
                 begin
-                    Magija.GetApiData();
+                    Magija.GetApiData2();
 
 
                 end;
             }
+            action(DownloadXML)
+            {
+                ApplicationArea = All;
+                Caption = 'Skini XML datoteku nije virus';
+                Image = New;
+                Promoted = true;
+                PromotedCategory = Category4;
+                PromotedIsBig = true;
 
+                trigger OnAction()
+                var
+                    DownloadXML: Codeunit "JSONCodeUnit";
+                begin
+                    DownloadXML.ExportXML();
+
+                end;
+            }
             action(TEST)
             {
                 ApplicationArea = All;
