@@ -118,6 +118,23 @@ page 50102 "Crypto rates API"
                 end;
 
             }
+
+            action(TEST2)
+            {
+                ApplicationArea = All;
+
+                trigger OnAction()
+                var
+                    data: Text;
+
+                    Testic: Codeunit "Metode";
+                begin
+
+
+                    Testic.ExportXML(data);
+                end;
+
+            }
         }
     }
 

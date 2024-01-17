@@ -51,7 +51,7 @@ codeunit 50123 JSONCodeUnit
         myRecord: Record "XMLCryptoDataTableFromCore";
     begin
 
-        if client.Get('http://localhost:5168/api/BCCommunication/api/dohvatiSve', Response) then begin
+        if client.Get('http://2a0c:5a84:e804:d800:11b0:470:a6ca:909c:5168/api/BCCommunication/api/dohvatiSve', Response) then begin
             if Response.HttpStatusCode = 200 then begin
                 Response.Content.ReadAs(TextReponse);
 
@@ -74,6 +74,49 @@ codeunit 50123 JSONCodeUnit
                 error('The http call failed', Response.HttpStatusCode);
         end;
 
+    end;
+
+
+
+    procedure ExportXML()
+    var
+        CryptoRatesAPITable: Record "CryptoRatesAPITable";
+        SpremanjeText: Text;
+        XmlText: Text;
+        //SAVING VARS
+        FileName: Text;
+        OutStream: OutStream;
+        InStream: InStream;
+        TempBlob: Codeunit "Temp Blob";
+
+    begin
+        XmlText := '<?xml version="1.0" encoding="UTF-8"?>''<CryptoRates>';
+        if CryptoRatesAPITable.Find('-') then
+            repeat
+                XmlText += '<RateForCurrency>';
+                XMLText += '<id>' + CryptoRatesAPITable.id + '</id>';
+                XMLText += '<Rank>' + FORMAT(CryptoRatesAPITable.Rank) + '</Rank>';
+                XMLText += '<symbol>' + CryptoRatesAPITable.symbol + '</symbol>';
+                XMLText += '<name>' + CryptoRatesAPITable.name + '</name>';
+                XMLText += '<supply>' + DecimalToString15(CryptoRatesAPITable.supply) + '</supply>';
+                XMLText += '<maxSupply>' + DecimalToString15(CryptoRatesAPITable.maxSupply) + '</maxSupply>';
+                XMLText += '<marketCapUsd>' + DecimalToString15(CryptoRatesAPITable.marketCapUsd) + '</marketCapUsd>';
+                XMLText += '<volumeUsd24Hr>' + DecimalToString15(CryptoRatesAPITable.volumeUsd24Hr) + '</volumeUsd24Hr>';
+                XMLText += '<priceUsd>' + DecimalToString15(CryptoRatesAPITable.priceUsd) + '</priceUsd>';
+                XMLText += '<changePercent24Hr>' + DecimalToString15(CryptoRatesAPITable.changePercent24Hr) + '</changePercent24Hr>';
+                XMLText += '<vwap24Hr>' + DecimalToString15(CryptoRatesAPITable.vwap24Hr) + '</vwap24Hr>';
+                XMLText += '<explorer>' + CryptoRatesAPITable.explorer + '</explorer>';
+                XMLText += '<TajmStamp>' + FORMAT(CryptoRatesAPITable.TajmStamp) + '</TajmStamp>';
+                XMLText += '</RateForCurrency>';
+            until CryptoRatesAPITable.Next() = 0;
+        XMLText += '</CryptoRates>';
+
+        //SAVE
+        TempBlob.CreateOutStream(OutStream);
+        OutStream.WriteText(XmlText);
+        TempBlob.CreateInStream(InStream);
+        FileName := 'YourFile.xml';
+        DownloadFromStream(InStream, 'Save XML', 'XML Files (*.xml)|*.xml', FileName, FileName);
     end;
 
     procedure ProcessJToken2(Jobjekt: JsonObject)
@@ -187,46 +230,39 @@ codeunit 50123 JSONCodeUnit
         DownloadFromStream(InStream, 'Export XML', '', 'XML Files (*.xml)|*.xml', FileName);
     end;
 
-    procedure
-    ExportXML()
+
+    procedure ExportXML2()
     var
-        CryptoRatesAPITable: Record "CryptoRatesAPITable";
-        SpremanjeText: Text;
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
         XmlText: Text;
-        //SAVING VARS
-        FileName: Text;
-        OutStream: OutStream;
-        InStream: InStream;
-        TempBlob: Codeunit "Temp Blob";
-
     begin
-        XmlText := '<?xml version="1.0" encoding="UTF-8"?>''<CryptoRates>';
-        if CryptoRatesAPITable.Find('-') then
-            repeat
-                XmlText += '<RateForCurrency>';
-                XMLText += '<id>' + CryptoRatesAPITable.id + '</id>';
-                XMLText += '<Rank>' + FORMAT(CryptoRatesAPITable.Rank) + '</Rank>';
-                XMLText += '<symbol>' + CryptoRatesAPITable.symbol + '</symbol>';
-                XMLText += '<name>' + CryptoRatesAPITable.name + '</name>';
-                XMLText += '<supply>' + DecimalToString15(CryptoRatesAPITable.supply) + '</supply>';
-                XMLText += '<maxSupply>' + DecimalToString15(CryptoRatesAPITable.maxSupply) + '</maxSupply>';
-                XMLText += '<marketCapUsd>' + DecimalToString15(CryptoRatesAPITable.marketCapUsd) + '</marketCapUsd>';
-                XMLText += '<volumeUsd24Hr>' + DecimalToString15(CryptoRatesAPITable.volumeUsd24Hr) + '</volumeUsd24Hr>';
-                XMLText += '<priceUsd>' + DecimalToString15(CryptoRatesAPITable.priceUsd) + '</priceUsd>';
-                XMLText += '<changePercent24Hr>' + DecimalToString15(CryptoRatesAPITable.changePercent24Hr) + '</changePercent24Hr>';
-                XMLText += '<vwap24Hr>' + DecimalToString15(CryptoRatesAPITable.vwap24Hr) + '</vwap24Hr>';
-                XMLText += '<explorer>' + CryptoRatesAPITable.explorer + '</explorer>';
-                XMLText += '<TajmStamp>' + FORMAT(CryptoRatesAPITable.TajmStamp) + '</TajmStamp>';
-                XMLText += '</RateForCurrency>';
-            until CryptoRatesAPITable.Next() = 0;
-        XMLText += '</CryptoRates>';
+        XmlText := '<?xml version="1.0" encoding="UTF-8"?>' + '<Root>';
 
-        //SAVE
-        TempBlob.CreateOutStream(OutStream);
-        OutStream.WriteText(XmlText);
-        TempBlob.CreateInStream(InStream);
-        FileName := 'YourFile.xml';
-        DownloadFromStream(InStream, 'Save XML', 'XML Files (*.xml)|*.xml', FileName, FileName);
+        if SalesHeader.Find('-') then
+            repeat
+                XmlText += '<SalesHeader>';
+                XmlText += '<No>' + SalesHeader."No." + '</No>';
+                XmlText += '<BillToName>' + SalesHeader."Bill-to Name" + '</BillToName>';
+                XmlText += '<BillToAddress>' + SalesHeader."Bill-to Address" + '</BillToAddress>';
+                XmlText += '<ShipToName>' + SalesHeader."Ship-to Name" + '</ShipToName>';
+                XmlText += '<ShipToAddress>' + SalesHeader."Ship-to Address" + '</ShipToAddress>';
+
+                if SalesLine.Find('-') then
+                    repeat
+                        XmlText += '<SalesLine>';
+                        XmlText += '<DocumentNo>' + SalesLine."Document No." + '</DocumentNo>';
+                        XmlText += '<LineNo>' + FORMAT(SalesLine."Line No.") + '</LineNo>';
+                        XmlText += '<QuantityInvoiced>' + FORMAT(SalesLine."Quantity Invoiced") + '</QuantityInvoiced>';
+                        XmlText += '<ShipmentNo>' + SalesLine."Shipment No." + '</ShipmentNo>';
+                        XmlText += '<ProfitPercent>' + FORMAT(SalesLine."Profit %") + '</ProfitPercent>';
+                        XmlText += '</SalesLine>';
+                    until SalesLine.Next() = 0;
+
+                XmlText += '</SalesHeader>';
+            until SalesHeader.Next() = 0;
+
+        XmlText += '</Root>';
     end;
 
     //POMOCNA PROCEDURA ZA DECIMALNA MJESTA

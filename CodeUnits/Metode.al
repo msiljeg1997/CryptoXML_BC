@@ -1,9 +1,6 @@
 codeunit 50111 Metode
 {
 
-
-
-
     procedure ExecuteMethod(var DataStream: Text)
     var
         CryptoRatesAPITable: Record "CryptoRatesAPITable";
@@ -67,9 +64,9 @@ codeunit 50111 Metode
         else begin
 
         end;
-
-
     end;
+
+
 
     procedure CheckDateTime(dateTime: DateTime): DateTime
     var
@@ -94,11 +91,42 @@ codeunit 50111 Metode
 
 
 
+    procedure ExportXML(var DataStream: Text)
+    var
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+    begin
+        DataStream := '<Root>';
+        if SalesHeader.Find('-') then
+            repeat
+                DataStream += '<SalesHeader>';
+                DataStream += '<No>' + SalesHeader."No." + '</No>';
+                DataStream += '<BillToName>' + SalesHeader."Bill-to Name" + '</BillToName>';
+                DataStream += '<BillToAddress>' + SalesHeader."Bill-to Address" + '</BillToAddress>';
+                DataStream += '<ShipToName>' + SalesHeader."Ship-to Name" + '</ShipToName>';
+                DataStream += '<ShipToAddress>' + SalesHeader."Ship-to Address" + '</ShipToAddress>';
+                DataStream += '<ShipToAddress>' + FORMAT(SalesHeader."Document Type") + '</ShipToAddress>';
 
+                SalesLine.SetRange("Document No.", SalesHeader."No.");
+                SalesLine.SetRange("Document Type", SalesLine."Document Type");
 
+                if SalesLine.Find('-') then
+                    repeat
+                        DataStream += '<SalesLine>';
+                        DataStream += '<DocumentNo>' + SalesLine."Document No." + '</DocumentNo>';
+                        DataStream += '<DocumentType>' + FORMAT(SalesLine."Document Type") + '</DocumentType>';
+                        DataStream += '<LineNo>' + FORMAT(SalesLine."Line No.") + '</LineNo>';
+                        DataStream += '<QuantityInvoiced>' + FORMAT(SalesLine."Quantity Invoiced") + '</QuantityInvoiced>';
+                        DataStream += '<ShipmentNo>' + SalesLine."Shipment No." + '</ShipmentNo>';
+                        DataStream += '<ProfitPercent>' + FORMAT(SalesLine."Profit %") + '</ProfitPercent>';
+                        DataStream += '</SalesLine>';
+                    until SalesLine.Next() = 0;
 
+                DataStream += '</SalesHeader>';
+            until SalesHeader.Next() = 0;
 
-
+        DataStream += '</Root>';
+    end;
 
 }
 

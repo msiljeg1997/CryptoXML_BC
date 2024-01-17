@@ -4,14 +4,17 @@ codeunit 50119 MainServisCore
     var
         kurcina: Text;
         data: Text;
-        imeMetode: Text;
+        x: Text;
 
         CryptoRatesAPITable: Record "CryptoRatesAPITable";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+
     begin
-        imeMetode := DataStream;
+        x := DataStream;
 
 
-        case imeMetode of
+        case x of
             'ExecuteMethod':
                 begin
                     cMetode.ExecuteMethod(data);
@@ -19,6 +22,12 @@ codeunit 50119 MainServisCore
                     DataStream += data;
                     DataStream += '</root>';
                 end;
+            'ExportXML':
+                begin
+                    cMetode.ExportXML(data);
+                    DataStream += data;
+                end;
+
             else
         end;
 
