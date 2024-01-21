@@ -130,7 +130,7 @@ page 50143 "XMLPageCrypto"
                 begin
                     kurcina := '';
 
-                    CORETEST.ExecuteMethod(kurcina);
+                    CORETEST.Egzekucija(kurcina);
                 end;
 
             }

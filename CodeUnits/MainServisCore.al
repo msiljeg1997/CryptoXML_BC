@@ -1,6 +1,6 @@
 codeunit 50119 MainServisCore
 {
-    procedure ExecuteMethod(var DataStream: Text)
+    procedure Egzekucija(var DataStream: Text)
     var
         kurcina: Text;
         data: Text;
@@ -25,7 +25,9 @@ codeunit 50119 MainServisCore
             'ExportXML':
                 begin
                     cMetode.ExportXML(data);
+                    DataStream := '<root>';
                     DataStream += data;
+                    DataStream += '</root>';
                 end;
 
             else

@@ -96,28 +96,26 @@ codeunit 50111 Metode
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
     begin
-        DataStream := '<Root>';
+        DataStream := '';
         if SalesHeader.Find('-') then
             repeat
                 DataStream += '<SalesHeader>';
-                DataStream += '<No>' + SalesHeader."No." + '</No>';
+                DataStream += '<No>' + FORMAT(SalesHeader."No.") + '</No>';
                 DataStream += '<BillToName>' + SalesHeader."Bill-to Name" + '</BillToName>';
                 DataStream += '<BillToAddress>' + SalesHeader."Bill-to Address" + '</BillToAddress>';
                 DataStream += '<ShipToName>' + SalesHeader."Ship-to Name" + '</ShipToName>';
                 DataStream += '<ShipToAddress>' + SalesHeader."Ship-to Address" + '</ShipToAddress>';
-                DataStream += '<ShipToAddress>' + FORMAT(SalesHeader."Document Type") + '</ShipToAddress>';
+                DataStream += '<DocumentType>' + FORMAT(SalesHeader."Document Type") + '</DocumentType>';
 
                 SalesLine.SetRange("Document No.", SalesHeader."No.");
-                SalesLine.SetRange("Document Type", SalesLine."Document Type");
+                SalesLine.SetRange("Document Type", SalesHeader."Document Type");
 
                 if SalesLine.Find('-') then
                     repeat
                         DataStream += '<SalesLine>';
                         DataStream += '<DocumentNo>' + SalesLine."Document No." + '</DocumentNo>';
                         DataStream += '<DocumentType>' + FORMAT(SalesLine."Document Type") + '</DocumentType>';
-                        DataStream += '<LineNo>' + FORMAT(SalesLine."Line No.") + '</LineNo>';
                         DataStream += '<QuantityInvoiced>' + FORMAT(SalesLine."Quantity Invoiced") + '</QuantityInvoiced>';
-                        DataStream += '<ShipmentNo>' + SalesLine."Shipment No." + '</ShipmentNo>';
                         DataStream += '<ProfitPercent>' + FORMAT(SalesLine."Profit %") + '</ProfitPercent>';
                         DataStream += '</SalesLine>';
                     until SalesLine.Next() = 0;
@@ -125,7 +123,7 @@ codeunit 50111 Metode
                 DataStream += '</SalesHeader>';
             until SalesHeader.Next() = 0;
 
-        DataStream += '</Root>';
+        Message(DataStream);
     end;
 
 }

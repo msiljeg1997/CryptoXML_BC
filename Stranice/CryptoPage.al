@@ -114,7 +114,7 @@ page 50102 "Crypto rates API"
                 begin
                     kurcina := '';
 
-                    CORETEST.ExecuteMethod(kurcina);
+                    CORETEST.Egzekucija(kurcina);
                 end;
 
             }
