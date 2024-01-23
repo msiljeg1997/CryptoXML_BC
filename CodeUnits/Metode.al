@@ -126,6 +126,43 @@ codeunit 50111 Metode
         Message(DataStream);
     end;
 
+
+    procedure UpdateRecord(No: Text; NewBillToName: Text; NewBillToAddress: Text; NewShipToName: Text; NewShipToAddress: Text; NewDocumentType: Text)
+    var
+        SalesHeader: Record "Sales Header";
+    begin
+        if SalesHeader.Get(NewDocumentType, No) then begin
+            SalesHeader."Bill-to Name" := NewBillToName;
+            SalesHeader."Bill-to Address" := NewBillToAddress;
+            SalesHeader."Ship-to Name" := NewShipToName;
+            SalesHeader."Ship-to Address" := NewShipToAddress;
+
+            SalesHeader.Modify();
+        end else
+            Error('nema errora %1', No);
+    end;
+
+    procedure EvaluateDocumentType(DocumentTypeText: Text): Enum "Sales Document Type"
+    begin
+        case DocumentTypeText of
+            'Quote':
+                exit("Sales Document Type"::Quote);
+            'Order':
+                exit("Sales Document Type"::Order);
+            'Invoice':
+                exit("Sales Document Type"::Invoice);
+            'Credit Memo':
+                exit("Sales Document Type"::"Credit Memo");
+            'Return Order':
+                exit("Sales Document Type"::"Return Order");
+            'Blanket Order':
+                exit("Sales Document Type"::"Blanket Order");
+            else
+                Error('Invalid Document Type: %1', DocumentTypeText);
+        end;
+    end;
+
+
 }
 
 

@@ -130,9 +130,31 @@ page 50143 "XMLPageCrypto"
                 begin
                     kurcina := '';
 
-                    CORETEST.Egzekucija(kurcina);
+
                 end;
 
+
+
+            }
+
+            action(MirkoFiliupovic)
+            {
+                ApplicationArea = All;
+
+                trigger OnAction()
+                var
+
+                    DataStreamXML: XmlDocument;
+                    string: Text;
+
+                    test: Codeunit MainServisCore;
+
+                begin
+                    string := '<root><UpdateRecord>UpdateRecord</UpdateRecord><No>1001</No><BillToName>string</BillToName><ShipToName>string</ShipToName><ShipToAddress>string</ShipToAddress><DocumentType>string</DocumentType></root>';
+                    test.Egzekucija(string);
+
+
+                end;
             }
         }
     }
