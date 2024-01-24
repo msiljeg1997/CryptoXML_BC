@@ -150,11 +150,44 @@ page 50143 "XMLPageCrypto"
                     test: Codeunit MainServisCore;
 
                 begin
-                    string := '<root><UpdateRecord>UpdateRecord</UpdateRecord><No>1001</No><BillToName>string</BillToName><ShipToName>string</ShipToName><ShipToAddress>string</ShipToAddress><DocumentType>string</DocumentType></root>';
+                    string := '<UpdateRecord><No.>104002</No.><BillToName>string</BillToName><BillToAddress>string</BillToAddress><ShipToName>string</ShipToName><ShipToAddress>string</ShipToAddress><DocumentType>Order</DocumentType></UpdateRecord>';
                     test.Egzekucija(string);
 
 
                 end;
+            }
+
+            action(ExportXML)
+            {
+                ApplicationArea = All;
+
+                trigger OnAction()
+                var
+                    data: Text;
+
+                    Testic: Codeunit "Metode";
+                begin
+
+
+                    Testic.ExportXML(data);
+                end;
+
+            }
+            action(UpdateRecord)
+            {
+                ApplicationArea = All;
+
+                trigger OnAction()
+                var
+                    data: Text;
+
+                    Testic: Codeunit "Metode";
+                begin
+
+
+                    Testic.UpdateRecord(data);
+                end;
+
             }
         }
     }

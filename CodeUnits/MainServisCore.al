@@ -13,69 +13,39 @@ codeunit 50119 MainServisCore
         xmlDoc: XmlDocument;
         No: Text;
         i: Integer;
+        b: Integer;
+        SalesHeaderDocNo: Text;
+        SalesHeaderNo: Integer;
+        SalesHeaderNoText: Text;
+        SalesHeaderDocType: Enum "Sales Document Type";
     begin
-        XmlDocument.ReadFrom(DataStream, xmlDoc);
-        if xmlDoc.SelectNodes('//UpdateRecord', ListaNoda) then begin
-            if ListaNoda.Count > 0 then begin
-                ListaNoda.Get(1, XmlNoda);
-                x := XmlNoda.AsXmlElement().Name();
-            end;
-
-            if xmlDoc.SelectNodes('//No', ListaNoda) then begin
-                for i := 1 to ListaNoda.Count do begin
-                    ListaNoda.Get(i, XmlNoda);
-                    No := XmlNoda.AsXmlElement().InnerText();
-                    if SalesHeader.Get(No) then begin
-                        if xmlDoc.SelectNodes('//BillToName', ListaNoda) then begin
-                            if ListaNoda.Count > 0 then begin
-                                ListaNoda.Get(1, XmlNoda);
-                                SalesHeader."Bill-to Name" := XmlNoda.AsXmlElement().InnerText();
+        x := DataStream;
+        case true of
+            true:
+                begin
+                    if x.StartsWith('ExecuteMethod') then begin
+                        cMetode.ExecuteMethod(resultData);
+                        DataStream := '<root>';
+                        DataStream += resultData;
+                        DataStream += '</root>';
+                    end
+                    else
+                        if x.StartsWith('ExportXML') then begin
+                            cMetode.ExportXML(resultData);
+                            DataStream := '<root>';
+                            DataStream += resultData;
+                            DataStream += '</root>';
+                        end
+                        else
+                            if x.StartsWith('<UpdateRecord>') then begin
+                                cMetode.UpdateRecord(DataStream);
                             end;
-                        end;
-                        if xmlDoc.SelectNodes('//BillToAddress', ListaNoda) then begin
-                            if ListaNoda.Count > 0 then begin
-                                ListaNoda.Get(1, XmlNoda);
-                                SalesHeader."Ship-to Address" := XmlNoda.AsXmlElement().InnerText();
-                            end;
-                        end;
-                        if xmlDoc.SelectNodes('//ShipToName', ListaNoda) then begin
-                            if ListaNoda.Count > 0 then begin
-                                ListaNoda.Get(1, XmlNoda);
-                                SalesHeader."Ship-to Name" := XmlNoda.AsXmlElement().InnerText();
-                            end;
-                        end;
-                        if xmlDoc.SelectNodes('//ShipToAddress', ListaNoda) then begin
-                            if ListaNoda.Count > 0 then begin
-                                ListaNoda.Get(1, XmlNoda);
-                                SalesHeader."Ship-to Address" := XmlNoda.AsXmlElement().InnerText();
-                            end;
-                        end;
-                        SalesHeader.Modify();
-                    end;
                 end;
-            end;
-
-            case x of
-                'ExecuteMethod':
-                    begin
-                        DataStream := '<root>';
-                        DataStream += resultData;
-                        DataStream += '</root>';
-                    end;
-                'ExportXML':
-                    begin
-                        cMetode.ExportXML(resultData);
-                        DataStream := '<root>';
-                        DataStream += resultData;
-                        DataStream += '</root>';
-                    end;
-                'UpdateRecord':
-                    begin
-
-                    end;
-            end;
         end;
     end;
+
+
+
 
     var
         myInt: Integer;

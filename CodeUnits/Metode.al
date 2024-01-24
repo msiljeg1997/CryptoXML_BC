@@ -163,6 +163,77 @@ codeunit 50111 Metode
     end;
 
 
+
+
+    procedure UpdateRecord(var DataStream: Text)
+    var
+        x: Text;
+        SalesHeader: Record "Sales Header";
+        ListaNoda: XmlNodeList;
+        XmlNoda: XmlNode;
+        xmlDoc: XmlDocument;
+        i: Integer;
+        b: Integer;
+        SalesHeaderDocNo: Text;
+        SalesHeaderNoText: Text;
+        SalesHeaderDocType: Enum "Sales Document Type";
+    begin
+        XmlDocument.ReadFrom(DataStream, xmlDoc);
+        if xmlDoc.SelectNodes('//UpdateRecord', ListaNoda) then begin
+            if ListaNoda.Count > 0 then begin
+                ListaNoda.Get(1, XmlNoda);
+                x := XmlNoda.AsXmlElement().Name();
+            end;
+
+            if xmlDoc.SelectNodes('//No.', ListaNoda) then begin
+                for i := 1 to ListaNoda.Count do begin
+                    ListaNoda.Get(i, XmlNoda);
+                    SalesHeaderNoText := XmlNoda.AsXmlElement().InnerText();
+                    if xmlDoc.SelectNodes('//DocumentType', ListaNoda) then begin
+                        for b := 1 to ListaNoda.Count do begin
+                            ListaNoda.Get(1, XmlNoda);
+                            SalesHeaderDocNo := XmlNoda.AsXmlElement().InnerText();
+                        end;
+
+                        if SalesHeaderDocNo <> '' then begin
+                            if Evaluate(SalesHeaderDocType, SalesHeaderDocNo) then begin
+                                if SalesHeader.Get(SalesHeaderDocType, SalesHeaderNoText) then begin
+                                    if xmlDoc.SelectNodes('//BillToName', ListaNoda) then begin
+                                        if ListaNoda.Count > 0 then begin
+                                            ListaNoda.Get(1, XmlNoda);
+                                            SalesHeader."Bill-to Name" := XmlNoda.AsXmlElement().InnerText();
+                                        end;
+                                    end;
+                                    if xmlDoc.SelectNodes('//BillToAddress', ListaNoda) then begin
+                                        if ListaNoda.Count > 0 then begin
+                                            ListaNoda.Get(1, XmlNoda);
+                                            SalesHeader."Ship-to Address" := XmlNoda.AsXmlElement().InnerText();
+                                        end;
+                                    end;
+                                    if xmlDoc.SelectNodes('//ShipToName', ListaNoda) then begin
+                                        if ListaNoda.Count > 0 then begin
+                                            ListaNoda.Get(1, XmlNoda);
+                                            SalesHeader."Ship-to Name" := XmlNoda.AsXmlElement().InnerText();
+                                        end;
+                                    end;
+                                    if xmlDoc.SelectNodes('//ShipToAddress', ListaNoda) then begin
+                                        if ListaNoda.Count > 0 then begin
+                                            ListaNoda.Get(1, XmlNoda);
+                                            SalesHeader."Ship-to Address" := XmlNoda.AsXmlElement().InnerText();
+                                        end;
+                                    end;
+                                    SalesHeader.Modify();
+                                end;
+                            end;
+                        end;
+                    end;
+                end;
+            end;
+        end;
+    end;
+
+
+
 }
 
 
