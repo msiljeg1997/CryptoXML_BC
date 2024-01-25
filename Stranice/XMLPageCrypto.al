@@ -150,7 +150,7 @@ page 50143 "XMLPageCrypto"
                     test: Codeunit MainServisCore;
 
                 begin
-                    string := '<UpdateRecord><No.>104002</No.><BillToName>string</BillToName><BillToAddress>string</BillToAddress><ShipToName>string</ShipToName><ShipToAddress>string</ShipToAddress><DocumentType>Order</DocumentType></UpdateRecord>';
+                    string := '<AddRecord><No.>234432</No.><BillToName>string</BillToName><BillToAddress>string</BillToAddress><ShipToName>string</ShipToName><ShipToAddress>string</ShipToAddress><DocumentType>Order</DocumentType></AddRecord>';
                     test.Egzekucija(string);
 
 
@@ -186,6 +186,23 @@ page 50143 "XMLPageCrypto"
 
 
                     Testic.UpdateRecord(data);
+                end;
+
+            }
+
+            action(DeleteRecord)
+            {
+                ApplicationArea = All;
+
+                trigger OnAction()
+                var
+                    data: Text;
+
+                    Testic: Codeunit "Metode";
+                begin
+
+
+                    Testic.DeleteRecord(data);
                 end;
 
             }

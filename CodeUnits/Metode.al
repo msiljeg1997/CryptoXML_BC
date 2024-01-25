@@ -91,6 +91,8 @@ codeunit 50111 Metode
 
 
 
+
+
     procedure ExportXML(var DataStream: Text)
     var
         SalesHeader: Record "Sales Header";
@@ -232,8 +234,100 @@ codeunit 50111 Metode
         end;
     end;
 
+    procedure AddRecord(var DataStream: Text)
+    var
+        SalesHeader: Record "Sales Header";
+        ListaNoda: XmlNodeList;
+        XmlNoda: XmlNode;
+        xmlDoc: XmlDocument;
+        NodeName: Text;
+        NodeValue: Text;
+        SalesHeaderNo: Text;
+        i: Integer;
+        SalesHeaderDocType: Enum "Sales Document Type";
+    begin
+        XmlDocument.ReadFrom(DataStream, xmlDoc);
+        xmlDoc.SelectNodes('/AddRecord/*', ListaNoda);
+        for i := 1 to ListaNoda.Count do begin
+            ListaNoda.Get(i, XmlNoda);
+            NodeName := XmlNoda.AsXmlElement().Name;
+            NodeValue := XmlNoda.AsXmlElement().InnerText();
+            case NodeName of
+                'No.':
+                    SalesHeaderNo := NodeValue;
+                'DocumentType':
+                    Evaluate(SalesHeaderDocType, NodeValue);
+            end;
+        end;
+        if SalesHeader.Get(SalesHeaderDocType, SalesHeaderNo) then
+            Error('Record sa No. %1 and Document Type %2 postoji.', SalesHeaderNo, FORMAT(SalesHeaderDocType));
+        for i := 1 to ListaNoda.Count do begin
+            ListaNoda.Get(i, XmlNoda);
+            NodeName := XmlNoda.AsXmlElement().Name;
+            NodeValue := XmlNoda.AsXmlElement().InnerText();
+            case NodeName of
+                'No.':
+                    SalesHeader."No." := NodeValue;
+                'BillToName':
+                    SalesHeader."Bill-to Name" := NodeValue;
+                'BillToAddress':
+                    SalesHeader."Bill-to Address" := NodeValue;
+                'ShipToName':
+                    SalesHeader."Ship-to Name" := NodeValue;
+                'ShipToAddress':
+                    SalesHeader."Ship-to Address" := NodeValue;
+                'DocumentType':
+                    Evaluate(SalesHeader."Document Type", NodeValue);
+            end;
+        end;
+        SalesHeader.Insert();
+    end;
 
 
+
+
+    procedure DeleteRecord(var DataStream: Text)
+    var
+        SalesHeader: Record "Sales Header";
+        ListaNoda: XmlNodeList;
+        XmlNoda: XmlNode;
+        xmlDoc: XmlDocument;
+        i: Integer;
+        b: Integer;
+        SalesHeaderDocNo: Text;
+        SalesHeaderNoText: Text;
+        SalesHeaderDocType: Enum "Sales Document Type";
+        x: Text;
+    begin
+        XmlDocument.ReadFrom(DataStream, xmlDoc);
+        if xmlDoc.SelectNodes('//DeleteRecord', ListaNoda) then begin
+            if ListaNoda.Count > 0 then begin
+                ListaNoda.Get(1, XmlNoda);
+                x := XmlNoda.AsXmlElement().Name();
+            end;
+
+            if xmlDoc.SelectNodes('//No.', ListaNoda) then begin
+                for i := 1 to ListaNoda.Count do begin
+                    ListaNoda.Get(i, XmlNoda);
+                    SalesHeaderNoText := XmlNoda.AsXmlElement().InnerText();
+                    if xmlDoc.SelectNodes('//DocumentType', ListaNoda) then begin
+                        for b := 1 to ListaNoda.Count do begin
+                            ListaNoda.Get(1, XmlNoda);
+                            SalesHeaderDocNo := XmlNoda.AsXmlElement().InnerText();
+                        end;
+
+                        if SalesHeaderDocNo <> '' then begin
+                            if Evaluate(SalesHeaderDocType, SalesHeaderDocNo) then begin
+                                if SalesHeader.Get(SalesHeaderDocType, SalesHeaderNoText) then begin
+                                    SalesHeader.Delete();
+                                end;
+                            end;
+                        end;
+                    end;
+                end;
+            end;
+        end;
+    end;
 }
 
 

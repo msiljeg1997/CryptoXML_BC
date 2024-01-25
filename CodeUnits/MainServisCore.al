@@ -39,13 +39,17 @@ codeunit 50119 MainServisCore
                         else
                             if x.StartsWith('<UpdateRecord>') then begin
                                 cMetode.UpdateRecord(DataStream);
-                            end;
+                            end
+                            else
+                                if x.StartsWith('<DeleteRecord>') then begin
+                                    cMetode.DeleteRecord(DataStream);
+                                end;
+                    if x.StartsWith('<AddRecord>') then begin
+                        cMetode.AddRecord(DataStream);
+                    end;
                 end;
         end;
     end;
-
-
-
 
     var
         myInt: Integer;
